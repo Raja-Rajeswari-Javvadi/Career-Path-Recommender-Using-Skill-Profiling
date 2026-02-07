@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your AI Career Roadmap</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --glass-bg: rgba(255, 255, 255, 0.92);
+        }
+
+        body {
+            /* Background alignment fixed to center top to prevent head cutting */
+            background: #f1f5f9 url('https://ik.imagekit.io/fu4uxhoyq/ChatGPT%20Image%20Feb%204,%202026,%2010_30_59%20AM.png?updatedAt=1770283446788') no-repeat center top fixed;
+            background-size: cover;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Fixed alignment for both Loading and Results */
+        .content-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start; /* Keeps everything on the left */
+            padding: 40px 0 40px 6%;   /* Matches your successful results layout */
+            min-height: 100vh;
+            align-items: center;       /* Vertically centers the cards */
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            max-width: 620px;
+            width: 100%;
+            height: fit-content;
+        }
+
+        /* RECTIFIED: Removed the fixed-center position to keep loader on the left */
+        .loader-inner {
+            text-align: center;
+            width: 100%;
+        }
+
+        .match-badge {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-left: auto;
+            margin-right: 15px;
+        }
+
+        .accordion-button:not(.collapsed) { background: #f8fafc; color: #6366f1; box-shadow: none; }
+        .accordion-button { font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; }
+        .chart-container { position: relative; height: 160px; margin-bottom: 20px; }
+
+        .motivation-banner {
+            background: #f0f9ff;
+            border-left: 6px solid #0ea5e9;
+            border-radius: 12px;
+            padding: 20px;
+            color: #0369a1;
+            margin-top: 2rem;
+            font-style: italic;
+        }
+
+        #shareToast {
+            visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
+            text-align: center; border-radius: 8px; padding: 16px; position: fixed;
+            z-index: 2000; left: 50%; bottom: 30px; transform: translateX(-50%);
+        }
+        #shareToast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
+        @media (max-width: 768px) {
+            .content-wrapper { padding: 20px; justify-content: center; }
+            .glass-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="shareToast">Link copied to clipboard! 🚀</div>
+
+    <div class="content-wrapper">
+        <div class="glass-card">
+
+            <div id="loadingView" class="loader-inner">
+                <div class="spinner-border text-primary mb-4" style="width: 3.5rem; height: 3.5rem;"></div>
+                <h4 class="fw-bold">Crafting Your Future...</h4>
+                <p class="text-muted mb-0">Career Strategist is identifying your top paths.</p>
+            </div>
+
+            <div id="resultView" style="display:none;">
+                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                    <h2 class="fw-bold mb-0 text-dark">Strategic Roadmaps</h2>
+                    <div class="btn-group">
+                        <button onclick="shareResults()" class="btn btn-primary btn-sm rounded-pill px-3 me-1">Share</button>
+                        <button onclick="downloadPDF()" class="btn btn-success btn-sm rounded-pill px-3 me-1">PDF</button>
+                        <a href="/" class="btn btn-outline-primary btn-sm rounded-pill px-3">Reset</a>
+                    </div>
+                </div>
+
+                <div class="accordion accordion-flush shadow-sm border rounded-3" id="careerAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                <span id="title1">Path 1</span>
+                                <span class="match-badge" id="badge1">--%</span>
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#careerAccordion">
+                            <div class="accordion-body">
+                                <div class="chart-container"><canvas id="chart1"></canvas></div>
+                                <div id="path1-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                <span id="title2">Path 2</span>
+                                <span class="match-badge" id="badge2">--%</span>
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#careerAccordion">
+                            <div class="accordion-body">
+                                <div class="chart-container"><canvas id="chart2"></canvas></div>
+                                <div id="path2-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                <span id="title3">Path 3</span>
+                                <span class="match-badge" id="badge3">--%</span>
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#careerAccordion">
+                            <div class="accordion-body">
+                                <div class="chart-container"><canvas id="chart3"></canvas></div>
+                                <div id="path3-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="motivation" class="motivation-banner"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pdf-container" style="display:none;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let careerScores = [];
+        async function loadData() {
+            const profile = sessionStorage.getItem("userProfile");
+            if (!profile) { window.location.href = "/"; return; }
+            const formData = new FormData();
+            const dataObj = JSON.parse(profile);
+            for (const key in dataObj) { formData.append(key, dataObj[key]); }
+
+            try {
+                const response = await fetch("/recommend", { method: "POST", body: formData });
+                const result = await response.json();
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = result.report;
+                const paths = tempDiv.querySelectorAll('h3');
+
+                paths.forEach((pathHeading, index) => {
+                    let content = "";
+                    let nextSibling = pathHeading.nextElementSibling;
+                    while (nextSibling && nextSibling.tagName !== 'H3') {
+                        content += nextSibling.outerHTML;
+                        nextSibling = nextSibling.nextElementSibling;
+                    }
+
+                    const pathTitle = pathHeading.innerText.trim();
+                    const accordionBody = document.getElementById(`path${index+1}-content`);
+                    const titleSpan = document.getElementById(`title${index+1}`);
+                    const badgeSpan = document.getElementById(`badge${index+1}`);
+
+                    if (accordionBody) {
+                        titleSpan.innerText = pathTitle;
+                        accordionBody.innerHTML = content;
+                        const scoreMatch = content.match(/(\d+)\/100/);
+                        const score = scoreMatch ? parseInt(scoreMatch[1]) : 80;
+                        badgeSpan.innerText = score + "% Match";
+                        renderChart(`chart${index+1}`, pathTitle, score);
+                        careerScores.push({title: pathTitle, score: score, html: content});
+                    }
+                });
+
+                document.getElementById("loadingView").style.display = "none";
+                document.getElementById("resultView").style.display = "block";
+                if(result.motivation) document.getElementById("motivation").innerHTML = "✨ " + result.motivation;
+            } catch (e) {
+                document.getElementById("loadingView").innerHTML = "<h4 class='text-danger'>Generation Failed</h4><p>Check connection.</p>";
+            }
+        }
+
+        function renderChart(canvasId, label, score) {
+            new Chart(document.getElementById(canvasId), {
+                type: 'bar',
+                data: {
+                    labels: ['Match Readiness'],
+                    datasets: [{
+                        data: [score],
+                        backgroundColor: '#6366f1',
+                        borderRadius: 10,
+                        barThickness: 30
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    scales: { x: { max: 100, beginAtZero: true, grid: { display: false } }, y: { display: false } },
+                    plugins: { legend: { display: false } },
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('pdf-container');
+            element.style.display = 'block';
+            element.innerHTML = `<h1 style="color:#6366f1; text-align:center;">AI Career Roadmap</h1><hr>`;
+            careerScores.forEach((item, i) => {
+                element.innerHTML += `<div style="padding:20px; color:#1e293b;"><h2 style="color:#6366f1;">${item.title}</h2><p><b>Match Score: ${item.score}%</b></p><div>${item.html}</div></div>${i < 2 ? '<div style="page-break-after:always;"></div>' : ''}`;
+            });
+            html2pdf().set({margin: 0.5, filename: 'My_Career_Roadmap.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }})
+                .from(element).save().then(() => { element.style.display = 'none'; element.innerHTML = ''; });
+        }
+
+        function shareResults() {
+            navigator.clipboard.writeText(window.location.origin).then(() => {
+                const toast = document.getElementById("shareToast");
+                toast.className = "show";
+                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+            });
+        }
+        window.onload = loadData;
+    </script>
+</body>
+</html>
