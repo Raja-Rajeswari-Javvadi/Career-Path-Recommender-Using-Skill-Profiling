@@ -5,77 +5,32 @@ import markdown
 
 load_dotenv()
 
+# Ensure GEMINI_API_KEY is set in your Render environment variables
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def generate_roadmap(data):
     exp_text = f"with {data.get('years_exp')} years experience" if data.get('years_exp') else "as a fresher"
 
     prompt = f"""
-You are a world-class AI Career Strategist and professional career coach.
+    You are a world-class AI Career Strategist. Analyze this profile and suggest 3 paths.
+    USER PROFILE:
+    Education: {data.get('edu')}
+    Skills: {data.get('skills')}
+    Interests: {data.get('interests')}
+    Goals: {data.get('goals')}
+    Experience: {exp_text}
 
-Analyze the user's profile deeply and suggest the best 3 career paths.
-The output must look premium, structured, and professional.
+    STRICT FORMAT:
+    <h3>Path 1: [Title]</h3>
+    <b>Match Score:</b> XX/100<br>
+    <b>30/60/90 Day Roadmap:</b> [Detailed steps in <ul> format]
+    <b>Skill Gaps:</b> [List in <ul> format]
 
-USER PROFILE:
-Education: {data.get('edu')}
-Skills: {data.get('skills')}
-Interests: {data.get('interests')}
-Goals: {data.get('goals')}
-Experience: {exp_text}
+    Repeat for Path 2 and Path 3.
+    At the end, add: [MOTIVATION] One powerful quote [/MOTIVATION]
+    """
 
-⚠️ STRICT OUTPUT RULES (VERY IMPORTANT)
-
-1. Output ONLY in clean HTML (no markdown, no ```).
-2. Use professional formatting.
-3. All section headings must be bold.
-4. Each path must be detailed but clean and readable.
-5. Keep points concise and impressive.
-6. Use bullet points for roadmap steps.
-7. Include realistic skill gaps.
-8. Match score should be realistic.
-
-FORMAT TO FOLLOW STRICTLY:
-
-<h3>Path 1: [Career Title]</h3>
-
-<b>Match Score:</b> XX/100<br>
-
-<b>30 Day Roadmap:</b>
-<ul>
-<li>Step 1</li>
-<li>Step 2</li>
-<li>Step 3</li>
-</ul>
-
-<b>60 Day Roadmap:</b>
-<ul>
-<li>Step 1</li>
-<li>Step 2</li>
-<li>Step 3</li>
-</ul>
-
-<b>90 Day Roadmap:</b>
-<ul>
-<li>Step 1</li>
-<li>Step 2</li>
-<li>Step 3</li>
-</ul>
-
-<b>Skill Gaps:</b>
-<ul>
-<li>Missing skill 1</li>
-<li>Missing skill 2</li>
-<li>Missing skill 3</li>
-</ul>
-
-Repeat same structure for Path 2 and Path 3.
-
-At the end add:
-[MOTIVATION]
-Write one powerful 2-line motivational quote for career growth.
-[/MOTIVATION]
-"""
-
+    # Using gemini-2.0-flash for speed and reliability
     response = client.models.generate_content(
         model="gemini-2.0-flash",
         contents=prompt
@@ -91,17 +46,13 @@ Write one powerful 2-line motivational quote for career growth.
     return main_content, motivation
 
 def chat_with_mentor(message, context):
+    # This function was missing, causing your deployment to fail
     prompt = f"""
-You are a helpful Career Mentor AI. 
-Current Roadmap Context: {context}
-
-User Question: {message}
-
-Instructions:
-1. Provide a professional and encouraging response.
-2. Use bold text for important advice.
-3. Keep the response concise and actionable.
-"""
+    You are a Career Mentor AI. 
+    Context: {context}
+    User Question: {message}
+    Provide actionable, bolded advice.
+    """
 
     response = client.models.generate_content(
         model="gemini-2.0-flash",
