@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 from google import genai
-import markdown
 
 load_dotenv()
 
@@ -12,25 +11,21 @@ def generate_roadmap(data):
     exp_text = f"with {data.get('years_exp')} years experience" if data.get('years_exp') else "as a fresher"
 
     prompt = f"""
-    You are a world-class AI Career Strategist. Analyze this profile and suggest 3 paths.
-    USER PROFILE:
+    You are a world-class AI Career Strategist. 
+    Analyze this profile:
     Education: {data.get('edu')}
     Skills: {data.get('skills')}
     Interests: {data.get('interests')}
     Goals: {data.get('goals')}
     Experience: {exp_text}
 
-    STRICT FORMAT:
-    <h3>Path 1: [Title]</h3>
-    <b>Match Score:</b> XX/100<br>
-    <b>30/60/90 Day Roadmap:</b> [Detailed steps in <ul> format]
-    <b>Skill Gaps:</b> [List in <ul> format]
-
-    Repeat for Path 2 and Path 3.
-    At the end, add: [MOTIVATION] One powerful quote [/MOTIVATION]
+    STRICT OUTPUT RULES:
+    1. Output ONLY clean HTML headings (h3) and lists (ul/li).
+    2. Provide 3 paths.
+    3. Include a Match Score for each.
+    4. At the very end, add: [MOTIVATION] One powerful quote [/MOTIVATION]
     """
 
-    # Using gemini-2.0-flash for speed and reliability
     response = client.models.generate_content(
         model="gemini-2.0-flash",
         contents=prompt
@@ -46,7 +41,7 @@ def generate_roadmap(data):
     return main_content, motivation
 
 def chat_with_mentor(message, context):
-    # This function was missing, causing your deployment to fail
+    # This function must be present to fix the ImportError
     prompt = f"""
     You are a Career Mentor AI. 
     Context: {context}
