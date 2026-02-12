@@ -19,16 +19,20 @@ def recommend():
         html_report, motivation = generate_roadmap(request.form)
         return jsonify({"report": html_report, "motivation": motivation})
     except Exception as e:
+        print("Roadmap Error:", e)
         return jsonify({"report": "Error generating roadmap"}), 500
 
 @app.route("/chat", methods=["POST"])
 def chat():
     try:
         data = request.json
-        reply = chat_with_mentor(data.get("message"), data.get("context", ""))
+        user_message = data.get("message")
+        context = data.get("context", "")
+        reply = chat_with_mentor(user_message, context)
         return jsonify({"reply": reply})
     except Exception as e:
-        return jsonify({"reply": "Mentor is busy. Try again later."}), 500
+        print("Chat Error:", e)
+        return jsonify({"reply": "I'm having trouble connecting right now."}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, port=8000)
