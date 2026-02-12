@@ -5,11 +5,9 @@ import markdown
 
 load_dotenv()
 
-# Create Gemini client
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def generate_roadmap(data):
-
     exp_text = f"with {data.get('years_exp')} years experience" if data.get('years_exp') else "as a fresher"
 
     prompt = f"""
@@ -35,8 +33,6 @@ Experience: {exp_text}
 6. Use bullet points for roadmap steps.
 7. Include realistic skill gaps.
 8. Match score should be realistic.
-
-══════════════════════════════════
 
 FORMAT TO FOLLOW STRICTLY:
 
@@ -72,37 +68,44 @@ FORMAT TO FOLLOW STRICTLY:
 <li>Missing skill 3</li>
 </ul>
 
-Repeat same structure for:
-
-<h3>Path 2: ...</h3>
-<h3>Path 3: ...</h3>
-
-══════════════════════════════════
+Repeat same structure for Path 2 and Path 3.
 
 At the end add:
-
 [MOTIVATION]
 Write one powerful 2-line motivational quote for career growth.
 [/MOTIVATION]
-
-⚠️ Do NOT explain anything outside this format.
-⚠️ Do NOT use markdown.
-⚠️ Only structured HTML output.
 """
 
     response = client.models.generate_content(
-        model="models/gemini-2.5-flash",
+        model="gemini-2.0-flash",
         contents=prompt
     )
 
     raw = response.text
-    print("GEMINI OUTPUT:\n", raw)
-
     main_content = raw.split("[MOTIVATION]")[0]
     motivation = ""
 
     if "[MOTIVATION]" in raw:
-        motivation = raw.split("[MOTIVATION]")[1].split("[/MOTIVATION]")[0]
+        motivation = raw.split("[MOTIVATION]")[1].split("[/MOTIVATION]")[0].strip()
 
-    html_report = markdown.markdown(main_content, extensions=['extra', 'nl2br'])
-    return html_report, motivation
+    return main_content, motivation
+
+def chat_with_mentor(message, context):
+    prompt = f"""
+You are a helpful Career Mentor AI. 
+Current Roadmap Context: {context}
+
+User Question: {message}
+
+Instructions:
+1. Provide a professional and encouraging response.
+2. Use bold text for important advice.
+3. Keep the response concise and actionable.
+"""
+
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt
+    )
+    
+    return response.text
